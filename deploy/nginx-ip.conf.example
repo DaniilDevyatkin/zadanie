@@ -1,0 +1,71 @@
+# Обратный прокси на голый IP: без домена и без Let's Encrypt.
+#
+# Зачем так: если провайдер, антивирус или школьная сеть режет https по имени
+# сайта (поле SNI в TLS-рукопожатии), адрес вида 104.128.130.176.nip.io не
+# открывается, а голый IP работает — браузер не подставляет имя в рукопожатие.
+#
+# Порт 80  — приложение как есть, без предупреждений браузера. Это адрес для
+#            студентов: http://104.128.130.176/
+# Порт 443 — тот же сервер, но с самоподписанным сертификатом: браузер один раз
+#            покажет предупреждение о сертификате, зато пароль админки и cookie
+#            идут по шифрованному каналу. Нужен для входа в /admin.
+#
+# Сертификат на голый IP Let's Encrypt не выпускает, только самоподписанный:
+#   openssl req -x509 -nodes -newkey rsa:2048 -days 3650 \
+#     -keyout /etc/ssl/private/zadanie-ip.key \
+#     -out /etc/ssl/certs/zadanie-ip.crt \
+#     -subj "/CN=104.128.130.176" \
+#     -addext "subjectAltName=IP:104.128.130.176"
+#   chmod 600 /etc/ssl/private/zadanie-ip.key
+#
+# Если IP сервера другой — замени 104.128.130.176 в этом файле и в CN/SAN.
+# Как поставить:
+#   cp deploy/nginx-ip.conf.example /etc/nginx/sites-available/zadanie
+#   nginx -t && systemctl reload nginx
+
+server {
+    listen 80 default_server;
+    server_name 104.128.130.176 _;
+
+    client_max_body_size 1m;
+
+    # защита от подмены заголовков: клиентские X-Forwarded-* не пробрасываем
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For   $remote_addr;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header Host              $host;
+
+    # ответы теста кэшировать нельзя (приложение и само ставит no-store)
+    proxy_buffering off;
+    proxy_read_timeout 120s;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+    }
+}
+
+server {
+    listen 443 ssl default_server;
+    server_name 104.128.130.176 _;
+
+    ssl_certificate     /etc/ssl/certs/zadanie-ip.crt;
+    ssl_certificate_key /etc/ssl/private/zadanie-ip.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    client_max_body_size 1m;
+
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For   $remote_addr;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header Host              $host;
+
+    proxy_buffering off;
+    proxy_read_timeout 120s;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+    }
+}
