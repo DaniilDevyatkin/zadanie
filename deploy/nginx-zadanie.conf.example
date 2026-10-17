@@ -1,45 +1,39 @@
-# Пример обратного прокси с HTTPS. Приложению нужен именно прокси, если ты
-# хочешь https: cookie админ-сессии помечается Secure только когда запрос
-# пришёл по https (приложение узнаёт об этом из заголовка X-Forwarded-Proto).
+# Обратный прокси для домена devyatkinzadanie.ru (сервер 104.128.130.176).
+#
+# Приложению нужен именно прокси, если ты хочешь https: cookie админ-сессии
+# помечается Secure только когда запрос пришёл по https (приложение узнаёт об
+# этом из заголовка X-Forwarded-Proto).
 #
 # В .env для этого случая поставь:
 #   APP_BIND=127.0.0.1
 #   FORWARDED_ALLOW_IPS=*
 #
-# Как поставить: скопируй в /etc/nginx/sites-available/zadanie, поправь
-# server_name и пути к сертификатам, затем:
-#   ln -s /etc/nginx/sites-available/zadanie /etc/nginx/sites-enabled/
-#   nginx -t && systemctl reload nginx
+# Порядок установки:
+#   1) DNS: A-запись devyatkinzadanie.ru → 104.128.130.176 (и www при желании);
+#   2) cp deploy/nginx-zadanie.conf.example /etc/nginx/sites-available/zadanie
+#      ln -sf /etc/nginx/sites-available/zadanie /etc/nginx/sites-enabled/zadanie
+#      nginx -t && systemctl reload nginx
+#   3) сертификат и переход на https — одной командой:
+#      certbot --nginx -d devyatkinzadanie.ru -d www.devyatkinzadanie.ru --redirect \
+#        -m kilo@gmail.com --agree-tos --no-eff-email --non-interactive
 #
-# Сертификат (если его ещё нет):
-#   apt install certbot python3-certbot-nginx
-#   certbot --nginx -d example.ru
+# certbot сам допишет в этот файл блок на 443 с сертификатом и редирект с http.
+# Пока сертификата нет, блока 443 здесь быть не должно: nginx не запустится с
+# путём к несуществующему файлу. Домен нужен потому, что Let's Encrypt не
+# выдаёт сертификаты на голый IP; вариант «только по IP» — в nginx-ip.conf.example.
 
 server {
     listen 80;
     listen [::]:80;
-    server_name example.ru;
+    server_name devyatkinzadanie.ru www.devyatkinzadanie.ru;
 
-    # всё на https
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    http2 on;
-    server_name example.ru;
-
-    ssl_certificate     /etc/letsencrypt/live/example.ru/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/example.ru/privkey.pem;
+    client_max_body_size 1m;
 
     # защита от подмены заголовков: клиентские X-Forwarded-* не пробрасываем
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Forwarded-For   $remote_addr;
     proxy_set_header X-Real-IP         $remote_addr;
     proxy_set_header Host              $host;
-
-    client_max_body_size 1m;
 
     # ответы теста кэшировать нельзя (приложение и само ставит no-store)
     proxy_buffering off;
@@ -51,9 +45,19 @@ server {
     }
 }
 
-# Вариант без nginx — Caddy, он сам получает сертификат:
+# Как будет выглядеть файл после certbot (добавится автоматически, руками не надо):
 #
-#   example.ru {
+# server {
+#     listen 443 ssl;
+#     server_name devyatkinzadanie.ru www.devyatkinzadanie.ru;
+#     ssl_certificate     /etc/letsencrypt/live/devyatkinzadanie.ru/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/devyatkinzadanie.ru/privkey.pem;
+#     ... те же proxy_set_header, что и выше ...
+# }
+#
+# Вариант без nginx — Caddy, он получает сертификат сам:
+#
+#   devyatkinzadanie.ru {
 #       reverse_proxy 127.0.0.1:8000
 #   }
 #

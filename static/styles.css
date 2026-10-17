@@ -2,10 +2,30 @@
    Кабинет заданий · базовые стили, защита текста, фоновые слои
    ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   0. Шрифт
+
+   SF Pro Display — шрифт Apple. Положить его файлом в сайт нельзя (лицензия
+   запрещает распространение вне техники Apple), поэтому он стоит первым в
+   списке: на macOS и iOS подставится он сам, а если поставить его руками на
+   Windows — тоже подхватится. Всем остальным отдаётся Inter: свободный шрифт
+   под лицензией SIL OFL, ближайший по рисунку к SF Pro
+   (static/fonts/InterVariable.woff2, текст лицензии рядом).
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Inter';
+  src: url('/static/fonts/InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --ring: rgba(122, 140, 255, 0.55);
   --glass: rgba(15, 19, 36, 0.72);
   --edge: rgba(148, 163, 255, 0.14);
+  --font-display: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont,
+    'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
 html,
@@ -17,6 +37,26 @@ body {
 
 body {
   overflow-x: hidden;
+  font-family: var(--font-display);
+}
+
+/* формам и кнопкам шрифт страницы, а не системный по умолчанию */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* цифры одинаковой ширины: таймер и номера вопросов не «прыгают» */
+.mono,
+.option__key,
+.nav-cell,
+.qa-num,
+.tabular {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
 /* --------------------------------------------------------------------------
@@ -292,7 +332,6 @@ svg {
   border-radius: 0.62rem;
   display: grid;
   place-items: center;
-  font-family: ui-monospace, Consolas, monospace;
   font-size: 0.85rem;
   font-weight: 700;
   color: #a9b6e8;
@@ -342,7 +381,6 @@ svg {
   border: 1px solid rgba(148, 163, 255, 0.16);
   background: rgba(12, 16, 31, 0.7);
   color: #8f9cc4;
-  font-family: ui-monospace, Consolas, monospace;
   font-size: 0.78rem;
   cursor: pointer;
   transition: all 0.16s ease;
@@ -368,6 +406,33 @@ svg {
 /* --------------------------------------------------------------------------
    6. Служебная фраза под вопросом
    -------------------------------------------------------------------------- */
+
+/* Приписка перед вопросом: обращение к языковой модели и блок «протокола». Всё
+   это рисуется, поэтому уходит на снимок экрана вместе с текстом вопроса. */
+.q-protocol {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid rgba(122, 140, 255, 0.5);
+  border-radius: 0.6rem;
+  background: rgba(12, 16, 31, 0.55);
+}
+
+.q-protocol__line {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: #a9b6e8;
+}
+
+.q-protocol__block {
+  margin: 0.6rem 0 0;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: #8f9cc4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 
 /* Строка идёт сразу под текстом вопроса: она есть в пикселях, поэтому попадает
    на снимок экрана вместе с вопросом и вариантами ответа. */
@@ -483,7 +548,7 @@ svg {
 }
 
 .mono {
-  font-family: ui-monospace, Consolas, monospace;
+  letter-spacing: 0.01em;
 }
 
 .link-underline {

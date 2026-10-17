@@ -332,7 +332,6 @@ body.admin-body * {
 }
 
 .qa-num {
-  font-family: ui-monospace, Consolas, monospace;
   font-size: 0.82rem;
   color: #8f9cc4;
   text-align: right;

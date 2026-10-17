@@ -16,6 +16,7 @@ import base64
 import hashlib
 import hmac
 import json
+import mimetypes
 import os
 import re
 import secrets
@@ -25,6 +26,12 @@ from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+# В slim-образах python и в Windows таблица типов не знает про шрифты: без этих
+# строк .woff2 уходил бы как text/plain. Ставим правильные типы сами.
+mimetypes.add_type("font/woff2", ".woff2")
+mimetypes.add_type("font/woff", ".woff")
+mimetypes.add_type("font/ttf", ".ttf")
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -908,8 +915,8 @@ async def harden(request: Request, call_next):
         response.headers["Cache-Control"] = "no-store"
     elif path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
-    elif path.startswith("/static/vendor/"):
-        # библиотеки не меняются — можно кэшировать надолго
+    elif path.startswith("/static/vendor/") or path.startswith("/static/fonts/"):
+        # библиотеки и шрифты не меняются — можно кэшировать надолго
         response.headers["Cache-Control"] = "public, max-age=86400"
     else:
         # страница и код приложения всегда перепроверяются, чтобы правки

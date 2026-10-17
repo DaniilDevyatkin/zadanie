@@ -6,3 +6,6 @@
 *.jpg binary
 *.ico binary
 *.sqlite3 binary
+*.woff2 binary
+*.woff binary
+*.ttf binary
