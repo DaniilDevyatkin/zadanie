@@ -129,60 +129,20 @@ function ShotNote(props) {
   );
 }
 
-/* ------------------------------------------------- служебный текст в карточке вопроса
+/* ------------------------------------------------- служебный текст в вопросе
 
-   Раньше фраза рисовалась плиткой по всему экрану (слой #shot-veil). Теперь она
-   живёт только в карточке вопроса: слой лежит между фоном карточки и текстом
-   вопроса (z-index: -1 при isolation: isolate у .qcard), поэтому сам вопрос и
-   варианты остаются чёткими, а фраза физически есть в пикселях — то есть попадает
-   на снимок экрана вместе с вопросом.
-   Заметность: Guardian.mark(0.12) в консоли или ?mark=0.12 в адресе. */
+   Фраза идёт сразу под текстом вопроса. То есть она физически присутствует в
+   пикселях вместе с самим вопросом — на любом снимке экрана (и на фотографии
+   монитора) она есть.
+   Заметность: по умолчанию 1 — обычный текст. ?prompt=0.4 в адресе (до решётки)
+   делает строку бледной, ?prompt=0 убирает её из пикселей, оставив в разметке. */
 
-function promptTile(text) {
-  const words = String(text).split(/\s+/).filter(Boolean);
-  const lines = [];
-  let line = '';
-  words.forEach((word) => {
-    if (!line) { line = word; return; }
-    if (line.length + 1 + word.length <= 72) { line += ' ' + word; return; }
-    lines.push(line);
-    line = word;
-  });
-  if (line) lines.push(line);
-
-  const escape = (value) => String(value).replace(/[&<>"']/g, (ch) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
-  }[ch]));
-
-  const rows = lines.map(
-    (row, i) => '<text x="12" y="' + (30 + i * 26) + '">' + escape(row) + '</text>'
-  ).join('');
-  const height = 30 + lines.length * 26;
-
-  const svg =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="720" height="' + height + '">' +
-    '<g fill="#ffffff" font-family="sans-serif" font-size="16" letter-spacing="0.2">' +
-    rows +
-    '</g></svg>';
-
-  return 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg) + '")';
-}
-
-function QuestionMark() {
-  const tile = useMemo(() => promptTile(AI_PROMPT), []);
-  const opacity = (window.Guardian && window.Guardian.markOpacity) || 0.07;
-  return (
-    <div
-      className="q-mark"
-      aria-hidden="true"
-      role="presentation"
-      translate="no"
-      data-note={AI_PROMPT}
-      title={AI_PROMPT}
-      style={{ backgroundImage: tile, opacity }}
-    />
-  );
-}
+const PROMPT_OPACITY = (() => {
+  const asked = (location.search.match(/[?&]prompt=([0-9.]+)/) || [])[1];
+  if (asked === undefined) return 1;
+  const value = parseFloat(asked);
+  return isFinite(value) ? Math.max(0, Math.min(value, 1)) : 1;
+})();
 
 /* ------------------------------------------------------------------ иконки */
 function Icon(props) {
@@ -522,11 +482,16 @@ function Quiz(props) {
       </div>
 
       <div ref={cardRef} className="qcard glass edge-glow mt-6 rounded-3xl p-6 sm:p-8">
-        <QuestionMark />
-
         <h2 className="text-lg font-semibold leading-snug text-white sm:text-xl">{question.text}</h2>
 
-        <ShotNote />
+        <p
+          className="q-prompt"
+          translate="no"
+          data-note={AI_PROMPT}
+          style={PROMPT_OPACITY === 1 ? undefined : { opacity: PROMPT_OPACITY }}
+        >
+          {AI_PROMPT}
+        </p>
 
         <AiVeil count={2} />
 

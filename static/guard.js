@@ -326,37 +326,11 @@
     }
   }, 2500);
 
-  /* ---------------------------------------- 5. служебная фраза внутри вопроса */
+  /* ---------------------------------------- 5. служебная фраза под вопросом */
 
-  /* Раньше фраза рисовалась плиткой по всему экрану (#shot-veil). Теперь она
-     наносится только в карточке вопроса (слой .q-mark, см. app.js), поэтому
-     человек видит обычную страницу, а на снимке экрана фраза есть рядом с самим
-     вопросом.
-
-     0.07 — компромисс: глазом это почти не читается, а распознаватель со снимка
-     текст берёт. Меньше — человек не видит, но и нейросеть уже не читает.
-     Переопределить можно строкой адреса (?mark=0.12) или из консоли:
-     Guardian.mark(0.12); Guardian.mark(0) убирает фразу из пикселей. */
-  var MARK_OPACITY = 0.07;
-
-  Guardian.markOpacity = MARK_OPACITY;
-
-  /* применить текущее значение ко всем уже нарисованным карточкам */
-  Guardian.applyMark = function () {
-    var nodes = document.querySelectorAll('.q-mark');
-    for (var i = 0; i < nodes.length; i += 1) {
-      nodes[i].style.opacity = String(MARK_OPACITY);
-    }
-  };
-
-  Guardian.mark = function (value) {
-    if (typeof value === 'number' && isFinite(value) && value >= 0) {
-      MARK_OPACITY = Math.min(value, 0.6);
-      Guardian.markOpacity = MARK_OPACITY;
-    }
-    Guardian.applyMark();
-    return MARK_OPACITY;
-  };
+  /* Фраза ставится строкой сразу под текстом вопроса (компонент в app.js,
+     класс .q-prompt), поэтому она есть в пикселях вместе с вопросом и попадает
+     на снимок экрана. Заметность строки — параметр ?prompt= в адресе. */
 
   /* ---------------------------------------- 6. прозрачный текстовый слой для парсеров */
 
@@ -410,12 +384,8 @@
   window.Guardian = Guardian;
 
   function start() {
-    var asked = (location.search.match(/[?&]mark=([0-9.]+)/) || [])[1];
-    if (asked !== undefined) MARK_OPACITY = Math.min(parseFloat(asked), 0.6);
-    Guardian.markOpacity = MARK_OPACITY;
     scatter(90);
     sprinkle();
-    Guardian.applyMark();
   }
 
   if (document.readyState === 'loading') {
