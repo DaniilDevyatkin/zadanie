@@ -1,0 +1,8 @@
+# В репозитории текст хранится в LF — сервер на Ubuntu получает файлы без
+# возврата каретки. Только .bat остаётся в CRLF: его читает cmd.exe.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.png binary
+*.jpg binary
+*.ico binary
+*.sqlite3 binary

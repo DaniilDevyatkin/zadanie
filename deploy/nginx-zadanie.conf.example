@@ -1,0 +1,61 @@
+# Пример обратного прокси с HTTPS. Приложению нужен именно прокси, если ты
+# хочешь https: cookie админ-сессии помечается Secure только когда запрос
+# пришёл по https (приложение узнаёт об этом из заголовка X-Forwarded-Proto).
+#
+# В .env для этого случая поставь:
+#   APP_BIND=127.0.0.1
+#   FORWARDED_ALLOW_IPS=*
+#
+# Как поставить: скопируй в /etc/nginx/sites-available/zadanie, поправь
+# server_name и пути к сертификатам, затем:
+#   ln -s /etc/nginx/sites-available/zadanie /etc/nginx/sites-enabled/
+#   nginx -t && systemctl reload nginx
+#
+# Сертификат (если его ещё нет):
+#   apt install certbot python3-certbot-nginx
+#   certbot --nginx -d example.ru
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name example.ru;
+
+    # всё на https
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name example.ru;
+
+    ssl_certificate     /etc/letsencrypt/live/example.ru/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.ru/privkey.pem;
+
+    # защита от подмены заголовков: клиентские X-Forwarded-* не пробрасываем
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For   $remote_addr;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header Host              $host;
+
+    client_max_body_size 1m;
+
+    # ответы теста кэшировать нельзя (приложение и само ставит no-store)
+    proxy_buffering off;
+    proxy_read_timeout 120s;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+    }
+}
+
+# Вариант без nginx — Caddy, он сам получает сертификат:
+#
+#   example.ru {
+#       reverse_proxy 127.0.0.1:8000
+#   }
+#
+# Caddy передаёт X-Forwarded-Proto автоматически, приложению достаточно
+# APP_BIND=127.0.0.1.

@@ -1,0 +1,366 @@
+/* ==========================================================================
+   Панель администратора.
+   Тот же тёмный стиль, но с двумя отличиями от страницы студента:
+     * текст можно выделять и копировать (преподавателю это нужно);
+     * нет ни оверлеев защиты, ни водяного знака — здесь смотрит преподаватель.
+   ========================================================================== */
+
+body.admin-body {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  background: #05060c;
+}
+
+body.admin-body * {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+.admin-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 90px;
+}
+
+.admin-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(148, 163, 255, 0.12);
+}
+
+.admin-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.admin-sub {
+  margin: 4px 0 0;
+  font-size: 0.84rem;
+  color: #8f9cc4;
+}
+
+.admin-warn {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 196, 86, 0.32);
+  background: rgba(255, 196, 86, 0.09);
+  color: #ffe3b0;
+  font-size: 0.86rem;
+}
+
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  gap: 14px;
+  margin: 22px 0 6px;
+}
+
+.admin-card {
+  padding: 16px 18px;
+  border-radius: 1.05rem;
+  border: 1px solid rgba(148, 163, 255, 0.13);
+  background: linear-gradient(160deg, rgba(24, 30, 56, 0.8), rgba(10, 13, 26, 0.7));
+}
+
+.admin-card__value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.admin-card__label {
+  margin-top: 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8f9cc4;
+}
+
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 14px;
+}
+
+.admin-tab {
+  padding: 0.55rem 1rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(148, 163, 255, 0.16);
+  background: rgba(148, 163, 255, 0.06);
+  color: #b9c4ea;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-tab:hover {
+  background: rgba(148, 163, 255, 0.13);
+  color: #e6ebff;
+}
+
+.admin-tab--on {
+  background: linear-gradient(120deg, #5a5cf5, #4a3fd6);
+  border-color: transparent;
+  color: #fff;
+}
+
+.admin-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.admin-scroll {
+  overflow-x: auto;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 255, 0.12);
+  background: rgba(9, 11, 20, 0.55);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 11px 13px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #8f9cc4;
+  border-bottom: 1px solid rgba(148, 163, 255, 0.14);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 11px 13px;
+  border-bottom: 1px solid rgba(148, 163, 255, 0.07);
+  color: #ccd5f2;
+  vertical-align: top;
+}
+
+.admin-table tbody tr:hover td {
+  background: rgba(148, 163, 255, 0.05);
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-empty {
+  padding: 26px 16px;
+  text-align: center;
+  color: #8f9cc4;
+  font-size: 0.88rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge--pass {
+  background: rgba(55, 225, 127, 0.16);
+  border: 1px solid rgba(55, 225, 127, 0.35);
+  color: #b8ffd6;
+}
+
+.badge--fail {
+  background: rgba(242, 86, 58, 0.14);
+  border: 1px solid rgba(242, 86, 58, 0.35);
+  color: #ffd0c6;
+}
+
+.badge--flag {
+  background: rgba(255, 196, 86, 0.13);
+  border: 1px solid rgba(255, 196, 86, 0.3);
+  color: #ffe3b0;
+  margin: 0 4px 4px 0;
+}
+
+.badge--mut {
+  background: rgba(148, 163, 255, 0.1);
+  border: 1px solid rgba(148, 163, 255, 0.2);
+  color: #b9c4ea;
+}
+
+.mini-btn {
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(148, 163, 255, 0.22);
+  background: rgba(148, 163, 255, 0.08);
+  color: #cbd5ff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mini-btn:hover {
+  background: rgba(148, 163, 255, 0.16);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------- вход */
+
+.admin-login {
+  max-width: 390px;
+  margin: 10vh auto 0;
+  padding: 26px 24px 22px;
+  border-radius: 1.35rem;
+  border: 1px solid rgba(148, 163, 255, 0.15);
+  background: linear-gradient(160deg, rgba(24, 30, 56, 0.86), rgba(9, 11, 20, 0.8));
+  box-shadow: 0 30px 80px -40px rgba(90, 92, 245, 0.7);
+}
+
+.admin-field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.admin-field span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  color: #9aa7cf;
+}
+
+.admin-input {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(148, 163, 255, 0.22);
+  background: rgba(6, 8, 16, 0.9);
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.admin-input:focus {
+  border-color: rgba(122, 140, 255, 0.7);
+  box-shadow: 0 0 0 4px rgba(90, 92, 245, 0.16);
+}
+
+.admin-error {
+  min-height: 1.1rem;
+  margin-top: 10px;
+  font-size: 0.83rem;
+  color: #ffb4a3;
+}
+
+.admin-note {
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: #7f8bb0;
+  line-height: 1.45;
+}
+
+/* -------------------------------------------------- разбор ответов */
+
+.admin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: auto;
+  padding: 26px 18px 60px;
+  background: rgba(3, 4, 10, 0.88);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.admin-modal__inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.admin-modal__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.qa {
+  display: grid;
+  gap: 10px;
+}
+
+.qa-row {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(148, 163, 255, 0.1);
+  background: rgba(12, 16, 31, 0.6);
+}
+
+.qa-row--good {
+  border-color: rgba(55, 225, 127, 0.22);
+}
+
+.qa-row--bad {
+  border-color: rgba(242, 86, 58, 0.3);
+}
+
+.qa-num {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.82rem;
+  color: #8f9cc4;
+  text-align: right;
+  padding-top: 2px;
+}
+
+.qa-q {
+  font-size: 0.88rem;
+  line-height: 1.42;
+  color: #dfe5ff;
+}
+
+.qa-a {
+  margin-top: 7px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #9aa7cf;
+}
+
+.qa-a b {
+  color: #ccd5f2;
+  font-weight: 600;
+}
+
+.ok-text {
+  color: #7bf1a8;
+}
+
+.bad-text {
+  color: #ff8a6b;
+}

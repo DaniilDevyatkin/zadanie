@@ -1,0 +1,34 @@
+# Секреты и результаты никогда не попадают в репозиторий.
+#
+# data/ содержит ключи подписи (session.key, admin.key), хеш пароля
+# администратора (admin.json) и базу прохождений (attempts.sqlite3) —
+# на чистой машине всё это создаётся заново при первом запуске.
+
+data/
+*.sqlite3
+*.key
+
+# окружение развёртывания
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# редакторы и ОС
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# логи и дампы
+*.log
+*.bak

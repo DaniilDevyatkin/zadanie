@@ -1,0 +1,37 @@
+# Развёртывание на сервере:  docker compose up -d --build
+#
+# Настройки берутся из файла .env рядом с этим файлом (скопируй .env.example).
+# Если .env нет — подставятся значения по умолчанию.
+
+services:
+  zadanie:
+    build: .
+    image: zadanie:latest
+    container_name: zadanie
+    restart: unless-stopped
+
+    environment:
+      # применяется только при первом запуске, пока нет data/admin.json
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      APP_PORT: "8000"
+      # доверяем заголовкам X-Forwarded-* только от обратного прокси;
+      # если контейнер доступен напрямую, поставь сюда его IP или оставь *
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-*}
+
+    ports:
+      # APP_BIND=0.0.0.0  — открыто наружу, можно зайти по http://IP:8000
+      # APP_BIND=127.0.0.1 — только через nginx/Caddy на том же сервере (рекомендуется)
+      - "${APP_BIND:-0.0.0.0}:8000:8000"
+
+    volumes:
+      # ключи, пароль админа и результаты переживают пересборку образа
+      - zadanie-data:/data
+
+    # лимиты: сервис лёгкий, больше ему не нужно
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+volumes:
+  zadanie-data:

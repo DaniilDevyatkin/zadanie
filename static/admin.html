@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Панель администратора</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate" />
+<meta name="referrer" content="no-referrer" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235a5cf5'/%3E%3Cpath d='M9 10.5h14M9 16h14M9 21.5h8' stroke='white' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="/static/styles.css" />
+<link rel="stylesheet" href="/static/admin.css" />
+</head>
+<body class="bg-ink-900 text-slate-200 antialiased admin-body">
+
+<!--
+  Ни одного инлайнового скрипта или стиля: на этой странице действует строгая
+  Content-Security-Policy (script-src 'self'), поэтому вставить чужой код в неё
+  не получится.
+-->
+
+<div class="backdrop" aria-hidden="true">
+  <div class="backdrop__blob backdrop__blob--a"></div>
+  <div class="backdrop__blob backdrop__blob--b"></div>
+  <div class="backdrop__grid"></div>
+  <div class="backdrop__noise"></div>
+</div>
+
+<div id="app" class="admin-wrap"></div>
+
+<noscript>
+  <div class="noscript">Для работы панели включите JavaScript.</div>
+</noscript>
+
+<script src="/static/admin.js"></script>
+</body>
+</html>

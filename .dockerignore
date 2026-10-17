@@ -1,0 +1,30 @@
+# В образ не попадает ничего лишнего: ни история git, ни секреты, ни база
+# результатов, ни локальное окружение. Папка data/ монтируется томом.
+
+.git
+.gitignore
+.gitattributes
+.github
+__pycache__
+*.py[cod]
+*.pyo
+
+# изменяемые данные: ключи подписи, хеш пароля админа, база результатов
+data
+*.sqlite3
+*.key
+
+# окружение развёртывания
+.env
+.env.*
+!.env.example
+
+# документация и вспомогательные файлы хоста
+README.md
+deploy
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+.dockerignore
+run.bat
+*.log
